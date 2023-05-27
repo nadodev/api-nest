@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UserCreateDto } from './dtos/userCreateDto';
-import { User } from './interface/user.interface';
-import { v4 as uuid } from 'uuid';
+import { UserEntity } from './interface/user.entity';
 import { hash } from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 type ApiResponse = {
   msg: string;
@@ -11,19 +12,19 @@ type ApiResponse = {
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
   async userCreate(userCreateDto: UserCreateDto): Promise<ApiResponse> {
     const salt = 10;
     const passwordHash = await hash(userCreateDto.password, salt);
 
-    const user: User = {
-      id: uuid(),
+    this.userRepository.save({
       ...userCreateDto,
       password: passwordHash,
-    };
-
-    this.users.push(user);
+    });
 
     return {
       msg: 'Usuário Salvo com Sucesso',
@@ -31,7 +32,7 @@ export class UserService {
     };
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return this.users;
+  async getAllUsers(): Promise<UserEntity[]> {
+    return this.userRepository.find();
   }
 }
