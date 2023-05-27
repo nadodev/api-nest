@@ -33,3 +33,10 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+## Ferramentas utilizadas
+- NestJs - Como framework Principal
+- Typescript
+- Bcrypt
+- uuid
+- Postgres
+- docker
